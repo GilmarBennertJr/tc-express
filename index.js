@@ -1,9 +1,9 @@
 const express = require("express")
 const consign = require("consign")
 const mongooseInicializer = require("./config/mongoose")
-const requester = require("./handlers/requester");
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const package = require("./package.json")
 
 const app = express()
 let config = {
@@ -15,20 +15,20 @@ let config = {
             database: ""
         },
         autoloadModels: true,
-        autoloadRepository: true        
+        autoloadRepository: true,
+        path: "/mongo"
     },
     routes: {
         path: "/routes",
         autoload: true
     },
-    useTCRequester: true,
     bodyParserSize: "50mb"
 }
 
 module.exports = {
 
     // Inicializa Express
-
+    
     config: (c) => {
         config = c
     },
@@ -41,7 +41,7 @@ module.exports = {
         console.log("    | |    | |____  | |____   / . \\  | |      | | \\ \\  | |____   ____) |  ____) |")
         console.log("    |_|     \\_____| |______| /_/ \\_\\ |_|      |_|  \\_\\ |______| |_____/  |_____/ ")
         
-        console.log('\n>> INICIALIZANDO TC EXPRESS V.1');
+        console.log(`\n>> INICIALIZANDO TC EXPRESS V.${package.version}`);
         console.log("_____________________________________________________________________________________")
 
         //Inicializa Consign
@@ -54,7 +54,7 @@ module.exports = {
             console.log(">> Mongo desabilitado")
         }
 
-        // Configura o autoload do Routes
+        // Configura o autoload do Utils
         if (config.utils && config.utils.autoload) {
             c.include(config.utils.path ? config.utils.path : "/utils")
             console.log(">> Autoload de pacoteis uteis habilitado")
@@ -70,13 +70,20 @@ module.exports = {
             console.log(">> Autoload de routes desabilitado")
         }
 
-        if (config.useTCRequester) {
-            app.requester = requester;
-            console.log(">> Generic TC Requester habilitado")
+        if (config.mongo && config.mongo.autoloadModels) {
+            c.include(config.mongo.path ? `${config.routes.path}/models/` : "/mongo/models")
+            console.log(">> Autoload de models Mongo habilitado")
         } else {
-            console.log(">> Generic TC Requester desabilitado")
+            console.log(">> Autoload de models Mongo desabilitado")
         }
-        
+
+        if (config.mongo && config.mongo.autoloadRepository) {
+            c.include(config.mongo.path ? `${config.routes.path}/repository/` : "/mongo/repository")
+            console.log(">> Autoload de repositorys Mongo habilitado")
+        } else {
+            console.log(">> Autoload de repositorys Mongo desabilitado")
+        }
+
         // Inclui dependencias no consign                
         c.into(app);
 
