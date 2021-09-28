@@ -15,7 +15,6 @@ let config = {
             database: ""
         },
         autoloadModels: true,
-        autoloadRepository: true,
         path: "/mongo"
     },
     routes: {
@@ -75,13 +74,6 @@ module.exports = {
             console.log(">> Autoload de models Mongo habilitado")
         } else {
             console.log(">> Autoload de models Mongo desabilitado")
-        }
-
-        if (config.mongo && config.mongo.autoloadRepository) {
-            c.include(config.mongo.path ? `${config.routes.path}/repository/` : "/mongo/repository")
-            console.log(">> Autoload de repositorys Mongo habilitado")
-        } else {
-            console.log(">> Autoload de repositorys Mongo desabilitado")
         }
 
         // Inclui dependencias no consign                
